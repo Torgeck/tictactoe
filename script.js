@@ -27,19 +27,23 @@ function createGame(p1, p2) {
     round = 0;
     console.log(getScore());
     gameboard = blankBoard();
+    display.updateScore(player1.getScore(), player2.getScore());
+    display.resetDisplayCells();
   }
 
   function playRound(row, column) {
     // Decides witch player goes p1 = X and p2 = O
     let currentPlayer = round % 2 === 0 ? player1 : player2;
-    let symbolPlaced = "*";
+    let symbolPlaced = false,
+      playerIcon = currentPlayer.getIcon();
 
     if (gameboard[row][column] === "*") {
       // Place the tile of the current player, increase the round and check win condition is met
-      gameboard[row][column] = currentPlayer.getIcon();
+      gameboard[row][column] = playerIcon;
+      display.updateCell(playerIcon, `${row},${column}`);
       round++;
-      symbolPlaced = currentPlayer.getIcon();
-      winFlag = checkWinner(currentPlayer.getIcon(), row, column);
+      symbolPlaced = true;
+      winFlag = checkWinner(playerIcon, row, column);
     } else {
       console.log("ERROR tile already ocuppied");
     }
@@ -194,6 +198,7 @@ function createDisplay(nameArray) {
       for (let indexBtn = 0; indexBtn < size; indexBtn++) {
         btn = document.createElement("button");
         btn.classList.add("cell");
+        btn.setAttribute("id", `${indexRow},${indexBtn}`);
         btn.textContent = "";
         addCellProperties(btn, indexRow, indexBtn);
 
@@ -204,22 +209,26 @@ function createDisplay(nameArray) {
 
   function addCellProperties(cell, row, column) {
     cell.addEventListener("click", function () {
-      let symbol = game.playRound(row, column);
+      let roundPlayed = game.playRound(row, column);
 
-      if (symbol != "*") {
-        // Change later to a png or something else to look prettier
-        cell.textContent = symbol;
+      if (roundPlayed) {
+        // Change background or something
       }
     });
   }
 
+  function updateCell(symbol, cellId) {
+    let cell = document.getElementById(cellId);
+    cell.textContent = symbol;
+  }
+
   function resetDisplayCells() {
-    let cells = document.getElementsByClassName("cell");
+    let cells = document.querySelectorAll(".cell");
 
     for (let i = 0; i < cells.length; i++) {
       cells[i].textContent = "";
     }
   }
 
-  return { updateName, updateScore, resetDisplayCells };
+  return { updateName, updateScore, updateCell, resetDisplayCells };
 }
