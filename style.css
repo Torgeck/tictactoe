@@ -1,13 +1,22 @@
 * {
   margin: 0;
+  font-family: Roobert, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+:root {
+  --red: #ff0000;
+  --blue: #0000ff;
+  --green: #00ff00;
+  --alternate-color: #d900ff;
 }
 
 body {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-items: center;
-  background-color: bisque;
+  background-color: black;
   gap: 20px;
   padding: 55px;
 }
@@ -19,6 +28,23 @@ select {
   font: inherit;
 }
 
+.header,
+.score {
+  font-size: 45px;
+  font-weight: 900;
+}
+
+.playerNames {
+  display: flex;
+  gap: 60px;
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.playerName:hover {
+  animation: flicker 0.4s infinite alternate;
+}
+
 .round {
   border-radius: 15px;
 }
@@ -27,7 +53,60 @@ select {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: blue;
+  gap: inherit;
+}
+
+.gameboard {
+  --primary-color: var(--blue);
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 20px;
+  padding: 50px;
+  background: var(--primary-color);
+  background: radial-gradient(
+    circle,
+    var(--primary-color) 0%,
+    rgba(0, 0, 0, 1) 72%
+  );
+}
+
+.neonText {
+  color: #fff;
+  text-shadow: 0 0 7px #fff, 0 0 10px #fff, 0 0 15px var(--primary-color),
+    0 0 21px var(--primary-color), 0 0 41px var(--primary-color), 0 0 53px,
+    0 0 102px var(--primary-color), 0 0 151px var(--primary-color);
+}
+
+@keyframes flicker {
+  0%,
+  18%,
+  22%,
+  25%,
+  53%,
+  57%,
+  100% {
+    text-shadow: 0 0 4px #fff, 0 0 11px var(--alternate-color),
+      0 0 19px var(--alternate-color), 0 0 40px var(--alternate-color),
+      0 0 80px var(--alternate-color), 0 0 90px var(--alternate-color),
+      0 0 100px var(--alternate-color), 0 0 150px var(--alternate-color);
+  }
+  20%,
+  24%,
+  55% {
+    text-shadow: none;
+  }
+}
+
+.redColor {
+  --primary-color: var(--red);
+}
+
+.greenColor {
+  --primary-color: var(--green);
+}
+
+.blueColor {
+  --primary-color: var(--blue);
 }
 
 .cell {
@@ -35,13 +114,10 @@ select {
   width: 100px;
   appearance: none;
   background-color: #000000;
-  border: 2px solid #1a1a1a;
-  color: #ffffff;
+  border: 2px solid #000000;
   cursor: pointer;
-  font-family: Roobert, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 32px;
+  font-weight: 900;
   line-height: normal;
   outline: none;
   text-align: center;
@@ -50,26 +126,13 @@ select {
 }
 
 .cell:hover {
-  box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+  box-shadow: whitesmoke 0 8px 15px;
   transform: translateY(-2px);
 }
 
 .cell:active {
   box-shadow: none;
   transform: translateY(0);
-}
-
-.playerNames {
-  display: flex;
-  gap: 60px;
-}
-
-.gameboard {
-  display: grid;
-  grid-template-columns: repeat(3, auto);
-  gap: 20px;
-  border: 10px solid #ffffff;
-  background-color: #ffffff;
 }
 
 .row {
