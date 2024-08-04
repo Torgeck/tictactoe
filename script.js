@@ -1,4 +1,13 @@
 const game = createGame("Player 1", "Player 2");
+const startBtn = document.querySelector(".start");
+
+startBtn.addEventListener("click", function () {
+  game.resetGameBoard();
+  // Change text button if it was restart
+  if (this.textContent === "Restart") {
+    this.textContent = this.getAttribute("txt-original");
+  }
+});
 
 function createGame(p1, p2) {
   let gameboard = blankBoard();
@@ -6,7 +15,8 @@ function createGame(p1, p2) {
   let winFlag = false;
   const player1 = createPlayer(p1, "X");
   const player2 = createPlayer(p2, "O");
-  const display = createDisplay([p1, p2]);
+  const playerArray = [player1, player2];
+  const display = createDisplay(playerArray);
   const getScore = () =>
     (score = `${player1.getScore()} - ${player2.getScore()}`);
 
@@ -22,12 +32,15 @@ function createGame(p1, p2) {
     return board;
   }
 
+  function updatePlayerName(newName, id) {
+    playerArray[id].setName(newName);
+    display.updateName(id, newName);
+  }
+
   function resetGameBoard() {
     winFlag = false;
     round = 0;
-    console.log(getScore());
     gameboard = blankBoard();
-    display.updateScore(player1.getScore(), player2.getScore());
     display.resetDisplayCells();
   }
 
@@ -37,34 +50,42 @@ function createGame(p1, p2) {
     let symbolPlaced = false,
       playerIcon = currentPlayer.getIcon();
 
-    if (gameboard[row][column] === "*") {
-      // Place the tile of the current player, increase the round and check win condition is met
-      gameboard[row][column] = playerIcon;
-      display.updateCell(playerIcon, `${row},${column}`);
-      round++;
-      symbolPlaced = true;
-      winFlag = checkWinner(playerIcon, row, column);
-    } else {
-      console.log("ERROR tile already ocuppied");
-    }
-
-    // Shows board
-    console.table(gameboard);
-
-    // Show the winner and reset de board
     if (winFlag) {
-      console.log(`${currentPlayer.name} WON`);
-      currentPlayer.increaseScore();
-      resetGameBoard();
+      alert("Reset the board to play again");
     } else {
-      // Check for ties
-      if (checkTie()) {
-        console.log(`It's a TIE`);
-        resetGameBoard();
+      if (gameboard[row][column] === "*") {
+        // Place the tile of the current player, increase the round and check win condition is met
+        gameboard[row][column] = playerIcon;
+        display.updateCell(playerIcon, `${row},${column}`);
+        round++;
+        symbolPlaced = true;
+        changeBtnText();
+        winFlag = checkWinner(playerIcon, row, column);
+      } else {
+        // Change for pop up msg
+        alert("ERROR tile already ocuppied");
+      }
+
+      // Show the winner and update score
+      if (winFlag) {
+        alert(`${currentPlayer.getName()} WON`);
+        currentPlayer.increaseScore();
+        display.updateScore(player1.getScore(), player2.getScore());
+      } else {
+        // Check for ties
+        if (checkTie()) {
+          alert(`It's a TIE`);
+        }
       }
     }
 
     return symbolPlaced;
+  }
+
+  function changeBtnText() {
+    if (startBtn.textContent === startBtn.getAttribute("txt-original")) {
+      startBtn.textContent = startBtn.getAttribute("txt-swap");
+    }
   }
 
   function checkTie() {
@@ -129,12 +150,19 @@ function createGame(p1, p2) {
     return aux.length === length;
   }
 
-  return { round, getScore, playRound, gameboard };
+  return {
+    round,
+    getScore,
+    playRound,
+    resetGameBoard,
+    updatePlayerName,
+    gameboard,
+  };
 }
 
 function createPlayer(playerName, playerIcon) {
-  const name = playerName;
   const icon = playerIcon;
+  let name = playerName;
   let score = 0;
 
   const getIcon = () => icon;
@@ -147,13 +175,13 @@ function createPlayer(playerName, playerIcon) {
   return { getName, setName, getIcon, getScore, increaseScore, resetScore };
 }
 
-function createDisplay(nameArray) {
+function createDisplay(playerArray) {
   const container = document.querySelector(".container");
   const scoreDisplay = document.createElement("div");
   const playerNames = document.createElement("div");
   const gameboard = document.createElement("div");
 
-  gameboard.classList.add("gameboard");
+  gameboard.classList.add("gameboard", "round");
   scoreDisplay.classList.add("score");
   playerNames.classList.add("playerNames");
 
@@ -169,14 +197,20 @@ function createDisplay(nameArray) {
     for (let i = 0; i < 2; i++) {
       let namePlate = document.createElement("div");
       namePlate.classList.add("playerName");
-      namePlate.setAttribute("id", `${i + 1}`);
-      namePlate.textContent = nameArray[i];
+      namePlate.textContent = playerArray[i].getName();
+      namePlate.setAttribute("id", `${i}`);
+      namePlate.addEventListener("click", function () {
+        let userInput = prompt("Enter new name");
+        if (userInput != null) {
+          game.updatePlayerName(userInput, this.getAttribute("id"));
+        }
+      });
       playerNames.appendChild(namePlate);
     }
   }
 
   function updateName(playerId, newName) {
-    let plate = playerNames.getElementById(playerId);
+    let plate = document.getElementById(playerId);
     plate.textContent = newName;
   }
 
@@ -187,22 +221,18 @@ function createDisplay(nameArray) {
   function createGameboardDisplay() {
     const size = 3;
     let indexRow;
-    let row, btn;
+    let btn;
 
     for (indexRow = 0; indexRow < size; indexRow++) {
-      row = document.createElement("div");
-      row.classList.add("row");
-      gameboard.appendChild(row);
-
       // adds cells
       for (let indexBtn = 0; indexBtn < size; indexBtn++) {
         btn = document.createElement("button");
-        btn.classList.add("cell");
+        btn.classList.add("cell", "round");
         btn.setAttribute("id", `${indexRow},${indexBtn}`);
         btn.textContent = "";
         addCellProperties(btn, indexRow, indexBtn);
 
-        row.appendChild(btn);
+        gameboard.appendChild(btn);
       }
     }
   }
