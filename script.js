@@ -182,7 +182,7 @@ function createDisplay(playerArray) {
   const gameboard = document.createElement("div");
 
   gameboard.classList.add("gameboard", "round");
-  scoreDisplay.classList.add("score");
+  scoreDisplay.classList.add("score", "greenColor", "neonText");
   playerNames.classList.add("playerNames");
 
   container.appendChild(playerNames);
@@ -196,7 +196,11 @@ function createDisplay(playerArray) {
   function createPlayerPlates() {
     for (let i = 0; i < 2; i++) {
       let namePlate = document.createElement("div");
-      namePlate.classList.add("playerName");
+      namePlate.classList.add("playerName", "neonText");
+      i === 1
+        ? namePlate.classList.toggle("redColor")
+        : namePlate.classList.toggle("blueColor");
+
       namePlate.textContent = playerArray[i].getName();
       namePlate.setAttribute("id", `${i}`);
       namePlate.addEventListener("click", function () {
@@ -227,7 +231,7 @@ function createDisplay(playerArray) {
       // adds cells
       for (let indexBtn = 0; indexBtn < size; indexBtn++) {
         btn = document.createElement("button");
-        btn.classList.add("cell", "round");
+        btn.classList.add("cell", "round", "neonText");
         btn.setAttribute("id", `${indexRow},${indexBtn}`);
         btn.textContent = "";
         addCellProperties(btn, indexRow, indexBtn);
@@ -242,7 +246,7 @@ function createDisplay(playerArray) {
       let roundPlayed = game.playRound(row, column);
 
       if (roundPlayed) {
-        // Change background or something
+        gameboard.classList.toggle("redColor");
       }
     });
   }
@@ -250,6 +254,9 @@ function createDisplay(playerArray) {
   function updateCell(symbol, cellId) {
     let cell = document.getElementById(cellId);
     cell.textContent = symbol;
+    symbol === "O"
+      ? cell.classList.toggle("redColor")
+      : cell.classList.toggle("blueColor");
   }
 
   function resetDisplayCells() {
@@ -257,7 +264,11 @@ function createDisplay(playerArray) {
 
     for (let i = 0; i < cells.length; i++) {
       cells[i].textContent = "";
+      cells[i].classList.toggle("redColor", false);
+      cells[i].classList.toggle("blueColor", false);
     }
+
+    gameboard.classList.toggle("redColor", false);
   }
 
   return { updateName, updateScore, updateCell, resetDisplayCells };
